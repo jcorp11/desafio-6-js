@@ -118,7 +118,7 @@ async function onclick(e) {
 
   // handles if the input is not a number
   if (!montoOG) {
-    resultadoDOM.innerText = "Escribe un monto";
+    resultadoDOM.innerText = "Ingrese un monto";
     return;
   }
 
