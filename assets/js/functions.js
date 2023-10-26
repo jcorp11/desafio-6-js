@@ -8,13 +8,18 @@ const coins = {
 
 async function getMonedas(code) {
   const endpoint = `https://mindicador.cl/api/${code}`;
-  console.log(endpoint);
+  // console.log(endpoint);
   try {
     const res = await fetch(endpoint);
+    // console.log(res);
+    if (res.status !== 200) {
+      throw new Error(res.statusText);
+    }
     const monedas = await res.json();
     return monedas;
   } catch (error) {
     console.log(error);
+    return error;
   }
 }
 
@@ -33,7 +38,7 @@ function formatNumber(number) {
     return "Invalid Input";
   }
 
-  // Convert the number to a string
+  // Convert the number to a string in case it doesnt have decimal places just leave as is
   let numberString =
     number % 1 === 0 ? number.toString() : number.toFixed(2).toString();
 
@@ -53,13 +58,13 @@ function prepararConfiguracionParaLaGrafica(data) {
   // Creamos las variables necesarias para el objeto de configuración
   const tipoDeGrafica = "line";
   const nombresDeLasMonedas = data.serie
-    .map((moneda) => formatDate(moneda.fecha))
+    .map((point) => formatDate(point.fecha))
     .slice(0, 10)
     .reverse();
   const titulo = `Evolución de ${coins[data.codigo]}`;
   const colorDeLinea = "red";
   const valores = data.serie
-    .map((moneda) => moneda.valor)
+    .map((point) => point.valor)
     .slice(0, 10)
     .reverse();
 
@@ -80,8 +85,10 @@ function prepararConfiguracionParaLaGrafica(data) {
   return config;
 }
 
-function destroyCharts(charts) {
-  //   console.log(Object.keys(charts), charts);
+function destroyCharts() {
+  const charts = Chart.instances;
+  // console.log(Object.keys(charts), charts);
+  // si es que hay algun chart lo destruye sino no, necesario para reemplazar un chart
   Object.keys(charts).forEach((key) => {
     charts[key].destroy();
   });
@@ -89,21 +96,16 @@ function destroyCharts(charts) {
 
 async function renderGrafica(config) {
   const chartDOM = document.getElementById("myChart");
+  // esta clase es overraidiada por el css despues de crear un chart
   chartDOM.classList.toggle("display-none");
-  const charts = Chart.instances;
-  //   console.log(charts);
-
-  if (Object.keys(charts).length !== 0) {
-    destroyCharts(charts);
-  }
+  destroyCharts();
   new Chart(chartDOM, config);
 }
-function convertirMoneda(data) {
-  const monto = Number(montoCLPDOM.value);
-  if (!monto) return;
+function convertirMoneda(data, montoOG) {
+  if (!montoOG) return;
   const tc = data.serie[0].valor;
-  console.log(tc);
-  const montoConvertido = monto / tc;
+  // console.log(tc);
+  const montoConvertido = montoOG / tc;
   return [formatNumber(montoConvertido), formatNumber(tc)];
 }
 
@@ -113,13 +115,40 @@ function agregarConversion(montoOG, moneda, montoCambiado, tipoCambio) {
 async function onclick(e) {
   e.preventDefault();
   const montoOG = Number(montoCLPDOM.value);
+
+  // handles if the input is not a number
+  if (!montoOG) {
+    resultadoDOM.innerText = "Escribe un monto";
+    return;
+  }
+
   const moneda = monedaDOM.value;
-  if (!moneda || !montoOG) return;
+  // handles if moneda is not selected
+  if (!moneda) {
+    // console.log({ moneda, bool: Boolean(moneda) });
+    resultadoDOM.innerText = "Selecciona una moneda";
+    return;
+  }
+  // if (!moneda || !montoOG) return;
+
   const data = await getMonedas(moneda);
-  const montoConvertido = convertirMoneda(data);
+
+  // handles if there is an error in API call
+  if (data instanceof Error) {
+    destroyCharts();
+    handleError(data);
+    return;
+  }
+
+  const montoConvertido = convertirMoneda(data, montoOG);
   agregarConversion(formatNumber(montoOG), coins[moneda], ...montoConvertido);
   const config = prepararConfiguracionParaLaGrafica(data);
   renderGrafica(config);
+}
+
+function handleError(err) {
+  console.log(err);
+  resultadoDOM.innerText = `${err}`;
 }
 
 export { onclick };
