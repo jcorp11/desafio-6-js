@@ -1,5 +1,11 @@
 import { monedaDOM, montoCLPDOM, resultadoDOM } from "./script.js";
 
+const coins = {
+  euro: "EUR",
+  uf: "UF",
+  dolar: "USD",
+};
+
 async function getMonedas(code) {
   const endpoint = `https://mindicador.cl/api/${code}`;
   console.log(endpoint);
@@ -48,10 +54,14 @@ function prepararConfiguracionParaLaGrafica(data) {
   const tipoDeGrafica = "line";
   const nombresDeLasMonedas = data.serie
     .map((moneda) => formatDate(moneda.fecha))
+    .slice(0, 10)
     .reverse();
-  const titulo = `Evoluicion de ${data.codigo}`;
+  const titulo = `Evolución de ${coins[data.codigo]}`;
   const colorDeLinea = "red";
-  const valores = data.serie.map((moneda) => moneda.valor).reverse();
+  const valores = data.serie
+    .map((moneda) => moneda.valor)
+    .slice(0, 10)
+    .reverse();
 
   const config = {
     type: tipoDeGrafica,
@@ -79,6 +89,7 @@ function destroyCharts(charts) {
 
 async function renderGrafica(config) {
   const chartDOM = document.getElementById("myChart");
+  chartDOM.classList.toggle("display-none");
   const charts = Chart.instances;
   //   console.log(charts);
 
@@ -96,8 +107,8 @@ function convertirMoneda(data) {
   return [formatNumber(montoConvertido), formatNumber(tc)];
 }
 
-function agregarConversion(montoOG, montoCambiado, tipoCambio) {
-  resultadoDOM.innerText = `Resultado: ${montoOG} CLP @ ${tipoCambio} = ${montoCambiado}`;
+function agregarConversion(montoOG, moneda, montoCambiado, tipoCambio) {
+  resultadoDOM.innerText = `${montoOG} CLP @ ${tipoCambio} = ${montoCambiado} ${moneda}`;
 }
 async function onclick(e) {
   e.preventDefault();
@@ -106,7 +117,7 @@ async function onclick(e) {
   if (!moneda || !montoOG) return;
   const data = await getMonedas(moneda);
   const montoConvertido = convertirMoneda(data);
-  agregarConversion(formatNumber(montoOG), ...montoConvertido);
+  agregarConversion(formatNumber(montoOG), coins[moneda], ...montoConvertido);
   const config = prepararConfiguracionParaLaGrafica(data);
   renderGrafica(config);
 }

@@ -10,6 +10,7 @@
 
 * {
   font-family: "Roboto", sans-serif;
+  text-align: center;
 }
 
 .font-roboto {
@@ -18,13 +19,54 @@
 body {
   text-align: center;
   padding: 0px 40px;
+  background-color: #1f1919;
 }
-.climas {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+
+.container {
+  background-color: grey;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 100px;
+  width: 400px;
+  border-radius: 5px;
+  margin-bottom: 20px;
 }
-.clima {
-  background: black;
+
+h1,
+h4,
+.paraTitulo,
+hr,
+.btn,
+.result {
   color: white;
+}
+
+.input {
+  height: 30px;
+  font-size: 1rem;
+  border-radius: 5px;
+  flex-grow: 1;
+}
+
+.paraTitulo {
+  padding-top: 10px;
+  font-size: 1rem;
+}
+
+select {
+  margin-bottom: 15px;
+  height: 30px;
+  border-radius: 5px;
+}
+
+.btn {
+  margin-bottom: 15px;
+}
+
+.grafica {
+  background-color: white;
+}
+
+.display-none {
+  display: none;
 }

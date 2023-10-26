@@ -27,13 +27,10 @@
     <link rel="stylesheet" href="assets/css/style.css" />
   </head>
   <body>
-    <!--     <h1>Últimos Sismos en Chile</h1>
-    <div class="grafica">
-      <canvas id="myChart"></canvas>
-    </div> -->
-
     <section class="main">
-      <h1>Converdor de monedas Nacional</h1>
+      <hr />
+      <h1>Conversor de monedas Nacional</h1>
+      <hr />
       <section class="container">
         <h4>Pesos CLP</h4>
         <input
@@ -42,18 +39,18 @@
           id="montoCLP"
           placeholder="Ingrese el monto en CLP"
         />
-        <p>Moneda a convertir:</p>
+        <p class="paraTitulo">Moneda a convertir:</p>
         <select name="moneda" id="moneda">
           <option value="">Selecciona una moneda</option>
           <option value="dolar">USD</option>
           <option value="euro">EUR</option>
           <option value="uf">UF</option>
         </select>
-        <button type="button text-success">Buscar</button>
+        <button type="button" class="btn btn-info">Convertir</button>
         <p class="result" id="result">...</p>
       </section>
       <div class="grafica">
-        <canvas id="myChart"></canvas>
+        <canvas class="display-none" id="myChart"></canvas>
       </div>
     </section>
 
